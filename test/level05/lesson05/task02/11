@@ -1,0 +1,38 @@
+ int i=0, j=0;
+        if (this.age>anotherCat.age)
+        {
+            i++;
+        }//Напишите тут ваш код
+        else
+        {
+            if (this.age<anotherCat.age)
+            j++;
+        }
+        if (this.weight>anotherCat.weight)
+        {
+            i++;
+        }//Напишите тут ваш код
+        else
+        {
+            if (this.weight<anotherCat.weight)
+            j++;
+        }
+        if (this.strength>anotherCat.strength)
+        {
+            i++;
+        }//Напишите тут ваш код
+        else
+        {
+            if (this.strength<anotherCat.strength)
+            j++;
+        }
+        if (i>j)
+        {
+            return(true);
+        }
+        else
+        {
+            if (i<j)
+            return(false);
+            else return(false);
+        }
