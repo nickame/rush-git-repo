@@ -59,25 +59,92 @@ public class Solution extends AbstractList<String> implements List<String>, Clon
         for (int i = 1; i < 16; i++) {
             list.add(String.valueOf(i));
         }
+        for(String s : list) System.out.println("->"+s);
         System.out.println("Expected 3, actual is " + ((Solution) list).getParent("8"));
         list.remove("5");
         System.out.println("Expected null, actual is " + ((Solution) list).getParent("11"));
+        for(String s : list) System.out.println("->"+s);
     }
 
+    transient int size = 0;
+    transient Node<String> first;
+    transient Node<String> last;
+
     public String getParent(String value) {
+
+
         //have to be implemented
         return null;
     }
 
     @Override
+    public boolean add(String s)
+    {
+        if(size==0)
+        {
+         //   first=new Node<>(null, s, )
+        }
+        linkLast(s);
+
+        return true;
+    }
+    void linkLast(String e) {
+
+        final Node<String> l = last;
+
+        final Node<String> newNode = new Node<>(l, e, null, null);
+
+        last = newNode;
+
+        if (l == null)
+
+            first = newNode;
+
+        else
+           if(l.chaild1==null)
+
+            l.chaild1 = newNode;
+           else if(l.chaild2==null)
+               l.chaild2=newNode;
+
+        size++;
+
+        modCount++;
+
+    }
+
+    @Override
+    public void add(int index, String element)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String get(int index)
     {
-        return this.get(index);
+        throw new UnsupportedOperationException();
+
     }
 
     @Override
     public int size()
     {
-        return 0;
+        return this.size;
+    }
+
+    public class Node<T> implements Serializable
+    {
+        T item;
+        Node<T> parent;
+        Node<T> chaild1;
+        Node<T> chaild2;
+
+        public Node(Node<T> parent, T item, Node<T> chaild1, Node<T> chaild2)
+        {
+            this.item = item;
+            this.parent = parent;
+            this.chaild1 = chaild1;
+            this.chaild2 = chaild2;
+        }
     }
 }

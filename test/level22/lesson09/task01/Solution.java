@@ -1,10 +1,7 @@
 package com.javarush.test.level22.lesson09.task01;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /* Обращенные слова
 В методе main с консоли считать имя файла, который содержит слова, разделенные пробелами.
@@ -19,60 +16,71 @@ import java.util.Scanner;
 о о
 тот тот
 */
-public class Solution {
+public class Solution
+{
     public static List<Pair> result = new LinkedList<>();
 
-    public static void main(String[] args) throws FileNotFoundException
+    public static void main(String[] args)
     {
-        Scanner scanner = new Scanner(System.in);
-        Scanner fscanner = new Scanner(new File(scanner.nextLine()));
-        String s=null;
-        while (fscanner.hasNextLine()){
-            s=s+" "+fscanner.nextLine();
-        }
-        scanner.close();
-        fscanner.close();
-        if (s!=null)
+        StringBuilder s = new StringBuilder();
+        try
         {
-            String[] str = s.split(" ");
-            for (int i = 0; i < str.length; i++)
-                for (int j = i + 1; j < str.length; j++)
-                {
-                    String s2 = new StringBuilder(str[j]).reverse().toString();
-                    if (str[i].equals(s2))
-                    {
-                        Pair p = new Pair();
-                        p.first = str[i];
-                        p.second = str[j];
-                        result.add(p);
-                        str[i] = "";
-                        str[j] = "";
-                    }
-                }
+            Scanner scanner = new Scanner(System.in);
+            Scanner filescaner = new Scanner(new File(scanner.nextLine()));
+            if (filescaner.hasNextLine()) ;
+            s.append(filescaner.nextLine());
+            while (filescaner.hasNextLine())
+            {
+                String tmp = filescaner.nextLine();
+                if (!tmp.isEmpty())
+                    s.append(" ").append(tmp);
+            }
+            scanner.close();
+            filescaner.close();
         }
-//        for(int i=0;i<result.size();i++)
-//            for(int j=i+1;j<result.size();j++)
-//            {
-//                if(((result.get(i).first.equals(result.get(j).first))||
-//                (result.get(i).first.equals(result.get(j).second)))&
-//                        ((result.get(i).second.equals(result.get(j).first))||
-//                (result.get(i).second.equals(result.get(j).second))))
-//                    result.remove(j);
-//            }
-        for (Pair p : result)
-            System.out.println(p);
+        catch (Exception e)
+        {
+        }
+        String tmp = s.toString();
+        String[] str = tmp.split(" ");
+        List<String> list = new ArrayList<>(Arrays.asList(str));
+        for (int i = 0; i < list.size(); i++)
+        {
+            for (int j = i + 1; j < list.size(); j++)
+            {
+
+                if (list.get(i).equals(new StringBuilder(list.get(j)).reverse().toString()))
+                {
+                    Pair p = new Pair();
+                    p.first = list.get(i);
+                    p.second = list.get(j);
+                    result.add(p);
+                    list.remove(j);
+                    break;
+                }
+            }
+        }
+
+        if (result.size() > 0)
+            for (Pair pair : result)
+            {
+                System.out.println(pair);
+            }
     }
 
-    public static class Pair {
+
+    public static class Pair
+    {
         String first;
         String second;
 
         @Override
-        public String toString() {
-            return  first == null && second == null ? "" :
+        public String toString()
+        {
+            return first == null && second == null ? "" :
                     first == null && second != null ? second :
-                    second == null && first != null ? first :
-                    first.compareTo(second) < 0 ? first + " " + second : second + " " + first;
+                            second == null && first != null ? first :
+                                    first.compareTo(second) < 0 ? first + " " + second : second + " " + first;
 
         }
     }
