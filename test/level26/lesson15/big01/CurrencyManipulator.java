@@ -25,108 +25,104 @@ public class CurrencyManipulator
         return currencyCode;
     }
 
-    public void addAmount(int denomination, int count){
+    public void addAmount(int denomination, int count)
+    {
 
-        if(denominations.containsKey(denomination))
+        if (denominations.containsKey(denomination))
         {
-          count =  denominations.get(denomination) + count;
+            count = denominations.get(denomination) + count;
         }
-        denominations.put(denomination,count);
+        denominations.put(denomination, count);
 
     }
-    public int getTotalAmount(){
-        int result=0;
+
+    public int getTotalAmount()
+    {
+        int result = 0;
 
         for (Integer i : denominations.keySet())
-        result=result+denominations.get(i)*i;
+            result = result + denominations.get(i) * i;
 
         return result;
     }
 
-    public boolean hasMoney(){
-    return getTotalAmount() > 0;
-    }
-
-    public boolean isAmountAvailable(int expectedAmount){
-        return getTotalAmount()>=expectedAmount;
-    }
-
-   public Map<Integer, Integer> withdrawAmount(int expectedAmount) throws NotEnoughMoneyException
+    public boolean hasMoney()
     {
-        List<Integer> bancnots = new ArrayList<>();
-        List<Integer> bancnotstemp = new ArrayList<>();
-        List<List<Integer>> resultlist = new ArrayList<>();
-        Map<Integer,Integer> result = new ConcurrentHashMap<>();
-        for(Integer i : denominations.keySet())
-            for (int j = 0; j < denominations.get(i) ; j++)
-            {
-                bancnots.add(i);
-            }
-        Collections.sort(bancnots, new Comparator<Integer>()
+        return getTotalAmount() > 0;
+    }
+
+    public boolean isAmountAvailable(int expectedAmount)
+    {
+        return getTotalAmount() >= expectedAmount;
+    }
+
+    public Map<Integer, Integer> withdrawAmount(int expectedAmount) throws NotEnoughMoneyException
+    {
+        Map<Integer, Integer> result = new ConcurrentHashMap<>();
+        TreeMap<Integer, Integer> tempMap = new TreeMap<>(Collections.reverseOrder());
+        tempMap.putAll(denominations);
+        ArrayList<Integer> listOfDenominations = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> listOfListOfDenominations = new ArrayList<>();
+        while (true)
         {
-            @Override
-            public int compare(Integer o1, Integer o2)
+            Integer tempSumm = expectedAmount;
+
+            for (Map.Entry<Integer, Integer> pair : tempMap.entrySet())
             {
-                return o2-o1;
-            }
-        });
-
-        while (true){
-            int summ=expectedAmount;
-            int summList=0;
-            for (Integer i : bancnots) summList= summList+i;
-            if(summList>=expectedAmount){
-                for(Integer i : bancnots){
-                    if(summ-i>=0){
-                        summ=summ-i;
-
-                        bancnotstemp.add(i);
+                for (int i = 0; i < pair.getValue(); i++)
+                {
+                    if ((tempSumm - pair.getKey()) >= 0)
+                    {
+                        tempSumm = tempSumm - pair.getKey();
+                        listOfDenominations.add(pair.getKey());
                     }
                 }
             }
-            else break;
-            if(summ==0){
-                resultlist.add(bancnotstemp);
-            }
-            if(bancnots.size()>=1)
-            bancnots.remove(0);
-            else break;
-            bancnotstemp=new ArrayList<>();
 
-
-        }
-        if(resultlist.size()==0) throw  new NotEnoughMoneyException();
-        int min = resultlist.get(0).size();
-
-        for (int i = 0; i < resultlist.size() ; i++)
-        {
-            if(resultlist.get(i).size()<min) min=resultlist.get(i).size();
-        }
-        if (min==0) throw new NotEnoughMoneyException();
-        for (int i = 0; i <resultlist.size() ; i++)
-        {
-            if(resultlist.get(i).size()==min){
-                for (Integer listItem : resultlist.get(i)){
-                    if(result.containsKey(listItem)) result.put(listItem,result.get(listItem)+1);
-                    else result.put(listItem,1);
-                }
-               break;
-            }
-        }
-        try
-        {
-            for (Map.Entry<Integer, Integer> entry : denominations.entrySet())
+            if (tempMap.isEmpty() && listOfListOfDenominations.size() == 0) throw new NotEnoughMoneyException();
+            if (tempMap.isEmpty() && listOfListOfDenominations.size() > 0) break;
+            if (tempSumm == 0)
             {
-                if (result.containsKey(entry.getKey()))
-                    if (entry.getValue() - result.get(entry.getKey()) == 0) denominations.remove(entry.getKey());
-                    else denominations.put(entry.getKey(), entry.getValue() - result.get(entry.getKey()));
+                listOfListOfDenominations.add(listOfDenominations);
+            }
+
+            tempMap.put(tempMap.firstKey(), tempMap.get(tempMap.firstKey()) - 1);
+            if (tempMap.get(tempMap.firstKey()) == 0) tempMap.remove(tempMap.firstKey());
+
+            listOfDenominations = new ArrayList<>();
+
+        }
+
+        int min = listOfListOfDenominations.get(0).size();
+        for (ArrayList<Integer> llist : listOfListOfDenominations)
+        {
+            if (llist.size() < min) min = llist.size();
+        }
+        for (ArrayList<Integer> llist : listOfListOfDenominations)
+        {
+            if (llist.size() == min)
+            {
+
+                for (Integer rezint : llist)
+                {
+
+                    if (result.containsKey(rezint))
+                    {
+                        result.put(rezint, result.get(rezint) + 1);
+                    } else result.put(rezint, 1);
+                    if (denominations.containsKey(rezint))
+                    {
+                        denominations.put(rezint, denominations.get(rezint) - 1);
+                        if (denominations.get(rezint) <= 0) denominations.remove(rezint);
+                    }
+
+                }
+                break;
             }
         }
-        catch (ConcurrentModificationException ignor){}
-
-
-
         return result;
     }
+
+
 }
 

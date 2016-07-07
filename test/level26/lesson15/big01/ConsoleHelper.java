@@ -5,12 +5,22 @@ import com.javarush.test.level26.lesson15.big01.exception.InterruptOperationExce
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ResourceBundle;
+
+import static com.javarush.test.level26.lesson15.big01.CashMachine.RESOURCE_PATH;
 
 /**
  * Created by nickame on 11.04.16.
  */
 public class ConsoleHelper
 {
+    private static ResourceBundle res= ResourceBundle.getBundle(RESOURCE_PATH + "common_en");
+
+    public static void printExitMessage(){
+        writeMessage(res.getString("the.end"));
+    }
+
+
     public static void writeMessage(String message)
     {
 
@@ -27,7 +37,10 @@ public class ConsoleHelper
         try
         {
              result=reader.readLine();
-            if(result.toLowerCase().equals("exit")) throw new InterruptOperationException();
+            if(result.toLowerCase().equals("exit")){
+                writeMessage(res.getString("the.end"));
+                throw new InterruptOperationException();
+            }
 
 
         }
@@ -40,7 +53,7 @@ public class ConsoleHelper
     public static String askCurrencyCode() throws InterruptOperationException
     {
         String currencyCode = null;
-        writeMessage("Введите код валюты ");
+        writeMessage(res.getString("choose.currency.code"));
         while (true)
         {
             currencyCode = readString();
@@ -49,14 +62,15 @@ public class ConsoleHelper
                 return currencyCode.toUpperCase();
             } else
             {
-                writeMessage(" Ошибка ввода - повторите.");
+                writeMessage(res.getString("invalid.data"));
             }
         }
     }
 
     public static String[] getValidTwoDigits(String currencyCode) throws InterruptOperationException
     {
-        writeMessage("Ввести два целых положительных числа(номинал количество)");
+        String message=String.format(res.getString("choose.denomination.and.count.format"),currencyCode);
+        writeMessage(message);
         String[] resalt;
         while (true)
         {
@@ -70,14 +84,21 @@ public class ConsoleHelper
             catch (Exception e)
             {
             }
-            writeMessage(" Ошибка ввода - повторите.");
+            writeMessage(res.getString("invalid.data"));
 
         }
     }
 
+
+
     public static Operation askOperation() throws InterruptOperationException{
 
-        writeMessage("Выберите операцию:\n1 - INFO\n2 - DEPOSIT\n3 - WITHDRAW\n4 - EXIT");
+        writeMessage(res.getString("choose.operation"));
+        writeMessage("1 - "+res.getString("operation.INFO"));
+        writeMessage("2 - "+res.getString("operation.DEPOSIT"));
+        writeMessage("3 - "+res.getString("operation.WITHDRAW"));
+        writeMessage("4 - "+res.getString("operation.EXIT"));
+
 
             while (true){
 
@@ -90,10 +111,10 @@ public class ConsoleHelper
                 catch (InterruptOperationException e){
                     throw new InterruptOperationException();
                 }
-                catch (Exception e){
-                    writeMessage("error - try again");
+                catch (IllegalArgumentException t)
+                {
+                    writeMessage(res.getString("invalid.data"));
                 }
-
         }
     }
 }

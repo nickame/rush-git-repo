@@ -19,6 +19,7 @@ public final class CommandExecutor
 
     static
     {
+        commandMap.put(Operation.LOGIN, new LoginCommand());
         commandMap.put(Operation.INFO, new InfoCommand());
         commandMap.put(Operation.DEPOSIT, new DepositCommand());
         commandMap.put(Operation.WITHDRAW, new WithdrawCommand());
